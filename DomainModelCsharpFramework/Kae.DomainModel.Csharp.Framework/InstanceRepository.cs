@@ -11,6 +11,7 @@ namespace Kae.DomainModel.Csharp.Framework
     public abstract class InstanceRepository
     {
         protected Dictionary<string, List<DomainClassDef>> domainInstances = new Dictionary<string, List<DomainClassDef>>();
+        protected Dictionary<string, ExternalEntityDef> externalEntities = new Dictionary<string, ExternalEntityDef>();
 
         public void Add(DomainClassDef instance)
         {
@@ -120,5 +121,19 @@ namespace Kae.DomainModel.Csharp.Framework
 
         public abstract IEnumerable<T> SelectInstances<T>(string className, IDictionary<string, object> conditionPropertyValues, Func<T, IDictionary<string, object>, bool> compare) where T : DomainClassDef;
 
+        public void Add(ExternalEntityDef externalEntity)
+        {
+            externalEntities.Add(externalEntity.EEKey, externalEntity);
+        }
+
+        public ExternalEntityDef GetExternalEntity(string eeKey)
+        {
+            ExternalEntityDef eeDef = null;
+            if (externalEntities.ContainsKey(eeKey))
+            {
+                eeDef = externalEntities[eeKey];
+            }
+            return eeDef;
+        }
     }
 }
