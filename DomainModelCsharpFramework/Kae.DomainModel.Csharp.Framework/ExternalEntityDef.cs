@@ -8,7 +8,7 @@ namespace Kae.DomainModel.Csharp.Framework
 {
     public interface ExternalEntityDef
     {
-        string EEKey { get;set; }
+        string EEKey { get; }
 
     }
 }
