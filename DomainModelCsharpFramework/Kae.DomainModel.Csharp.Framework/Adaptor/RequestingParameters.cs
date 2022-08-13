@@ -9,6 +9,7 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor
 {
     public class RequestingParameters
     {
+        public string OpType { get; set; }
         public string Name { get; set; }
         public IDictionary<string, object> Parameters { get; set; }
 
