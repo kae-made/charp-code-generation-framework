@@ -17,6 +17,19 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor
             this.logger = logger;
         }
 
+        protected Dictionary<string, Dictionary<string, ParamSpec>> domainOpsParamSpecs;
+        protected Dictionary<string, ClassSpec> classSpecs;
+        protected static string domainModelName;
+
+        public Dictionary<string, Dictionary<string, ParamSpec>> DomainOperationSpecs { get { return domainOpsParamSpecs; } }
+        public Dictionary<string, ClassSpec> ClassSpecs { get { return classSpecs; } }
+        public string DomainModelName { get { return domainModelName; } }
+
+        public string GetDataTypeName(int n)
+        {
+            return ((ParamSpec.DataType)Enum.ToObject(typeof(ParamSpec.DataType), n)).ToString();
+        }
+
         public abstract string InvokeDomainOperation(string name, RequestingParameters parameters);
         public abstract string InvokeDomainClassOperation(string classKeyLett, string name,  RequestingParameters parameters);
         public abstract string SendEvent(string classKeyLett, string eventLabel, RequestingParameters parameters);
@@ -29,23 +42,33 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor
         public abstract string GetDomainOperationsSpec();
         public abstract string GetClassesSpec();
 
-        protected bool CheckProperties(IDictionary<string, PropSpec> propSpecs, RequestingParameters opInvocation, RequestingParameters invSpec)
+        public abstract string GetDomainModelSpec();
+
+        protected bool CheckProperties(IDictionary<string, PropSpec> propSpecs, RequestingParameters propUpdateParams, RequestingParameters invSpec)
         {
-            bool valid = CheckIdentity(propSpecs, opInvocation, invSpec);
+            bool valid = CheckIdentity(propSpecs, propUpdateParams, invSpec);
             if (valid)
             {
-                foreach (var opParmKey in opInvocation.Parameters.Keys)
+                foreach (var propKey in propUpdateParams.Parameters.Keys)
                 {
-                    if (propSpecs.ContainsKey(opParmKey))
+                    if (propSpecs.ContainsKey(propKey))
                     {
-                        var propSpec = propSpecs[opParmKey];
+                        var propSpec = propSpecs[propKey];
                         if (propSpec.Writable)
                         {
-                            var jeP = (JsonElement)opInvocation.Parameters[opParmKey];
-                            object pValue = XFromJsonToObj(ref valid, propSpec.DataType, jeP);
+                            object pValue = null;
+                            if (propUpdateParams.Parameters[propKey] is JsonElement)
+                            {
+                                var jeP = (JsonElement)propUpdateParams.Parameters[propKey];
+                                pValue = XFromJsonToObj(ref valid, propSpec.DataType, jeP);
+                            }
+                            else
+                            {
+                                pValue = propUpdateParams.Parameters[propKey];
+                            }
                             if (pValue != null && valid)
                             {
-                                invSpec.Parameters.Add(opParmKey, pValue);
+                                invSpec.Parameters.Add(propKey, pValue);
                             }
                         }
                     }
@@ -103,8 +126,16 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor
                 if (valid)
                 {
                     var paramSpec = paramSpecs[pk];
-                    var jeP = (JsonElement)opInvocation.Parameters[pk];
-                    object pValue = XFromJsonToObj(ref valid, paramSpec.TypeKind, jeP);
+                    object pValue = null;
+                    if (opInvocation.Parameters[pk] is JsonElement)
+                    {
+                        var jeP = (JsonElement)opInvocation.Parameters[pk];
+                        pValue = XFromJsonToObj(ref valid, paramSpec.TypeKind, jeP);
+                    }
+                    else
+                    {
+                        pValue = opInvocation.Parameters[pk];
+                    }
                     if (pValue != null)
                     {
                         invSpec.Parameters.Add(pk, pValue);
@@ -127,7 +158,7 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor
             return valid;
         }
 
-        protected  object XFromJsonToObj(ref bool valid, ParamSpec.DataType typeKind, JsonElement jeP)
+        public object XFromJsonToObj(ref bool valid, ParamSpec.DataType typeKind, JsonElement jeP)
         {
             object pValue = null;
             switch (jeP.ValueKind)
@@ -225,6 +256,37 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor
             }
 
             return pValue;
+        }
+
+        public static object XFromStringToObj(string data, ParamSpec.DataType dataType, out bool valid)
+        {
+            object result;
+            valid = true;
+
+            switch (dataType)
+            {
+                case ParamSpec.DataType.Boolean:
+                    result = Convert.ToBoolean(data);
+                    break;
+                case ParamSpec.DataType.Integer:
+                    result = Convert.ToInt32(data);
+                    break;
+                case ParamSpec.DataType.Real:
+                    result = Convert.ToDouble(data);
+                    break;
+                case ParamSpec.DataType.String:
+                    result = data;
+                    break;
+                case ParamSpec.DataType.DateTime:
+                    result = Convert.ToDateTime(data);
+                    break;
+                default:
+                    result = data;
+                    valid = false;
+                    break;
+            }
+
+            return result;
         }
     }
 }

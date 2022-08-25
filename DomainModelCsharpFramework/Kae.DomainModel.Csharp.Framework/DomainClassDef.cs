@@ -22,6 +22,6 @@ namespace Kae.DomainModel.Csharp.Framework
         IDictionary<string, object> ChangedProperties();
         IDictionary<string, object> GetProperties(bool onlyIdentity);
         // IList<ChangedState> ChangedStates();
-
+        string GetIdentities();
     }
 }
