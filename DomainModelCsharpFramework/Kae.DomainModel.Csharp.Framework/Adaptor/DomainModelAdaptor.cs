@@ -44,6 +44,11 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor
 
         public abstract string GetDomainModelSpec();
 
+        public abstract void LoadDomainInstances(string instances);
+        public abstract string SaveDomainInstances();
+
+        public abstract void RegisterUpdateHandler(InstanceRepository.ClassPropertiesUpdateHandler classPropertiesUpdateHandler, InstanceRepository.RelationshipUpdateHandler relationshipUpdateHandler);
+
         protected bool CheckProperties(IDictionary<string, PropSpec> propSpecs, RequestingParameters propUpdateParams, RequestingParameters invSpec)
         {
             bool valid = CheckIdentity(propSpecs, propUpdateParams, invSpec);

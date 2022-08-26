@@ -29,6 +29,11 @@ namespace Kae.DomainModel.Csharp.Framework
             RelationshipUpdated?.Invoke(this, new RelationshipUpdatedEventArgs() { Operation = operation.ToString(), RelationshipId = relId, Phrase = phrase, SourceClassKeyLetter = source.ClassName, SourceIdentities = source.GetIdentities(), DestinationClassKeyLetter = destination.ClassName, DestinationIdentities = destination.GetIdentities() });
         }
 
+        public IEnumerable<string> GetDomainNames()
+        {
+            return domainInstances.Keys;
+        }
+
         public void Add(DomainClassDef instance)
         {
             if (!domainInstances.ContainsKey(instance.ClassName))
@@ -130,7 +135,7 @@ namespace Kae.DomainModel.Csharp.Framework
         /// instances.value is instances states of the domain class.
         /// each item of the instances.value is property name and value pairs.
         ///
-        public abstract void LoadState(IDictionary<string, IList<IDictionary<string, object>>> instances);
+        public abstract void LoadState(string domainName, IDictionary<string, IList<IDictionary<string, object>>> instances);
 
         public abstract void UpdateCInstance(CInstanceChagedState instanceState);
         public abstract void UpdateCLink(CLinkChangedState linkState);
