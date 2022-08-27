@@ -1,4 +1,6 @@
-﻿using Kae.Utility.Logging;
+﻿// Copyright (c) Knowledge & Experience. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using Kae.Utility.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +49,7 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor
         public abstract void LoadDomainInstances(string instances);
         public abstract string SaveDomainInstances();
 
-        public abstract void RegisterUpdateHandler(InstanceRepository.ClassPropertiesUpdateHandler classPropertiesUpdateHandler, InstanceRepository.RelationshipUpdateHandler relationshipUpdateHandler);
+        public abstract void RegisterUpdateHandler(ClassPropertiesUpdateHandler classPropertiesUpdateHandler, RelationshipUpdateHandler relationshipUpdateHandler);
 
         protected bool CheckProperties(IDictionary<string, PropSpec> propSpecs, RequestingParameters propUpdateParams, RequestingParameters invSpec)
         {

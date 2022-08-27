@@ -8,26 +8,13 @@ using System.Threading.Tasks;
 
 namespace Kae.DomainModel.Csharp.Framework
 {
-    public abstract class InstanceRepository
+    public abstract class InstanceRepository : INotifyInstancesSstateChanged
     {
         protected Dictionary<string, List<DomainClassDef>> domainInstances = new Dictionary<string, List<DomainClassDef>>();
         protected Dictionary<string, ExternalEntityDef> externalEntities = new Dictionary<string, ExternalEntityDef>();
 
-        public delegate void ClassPropertiesUpdateHandler(object sender, ClassPropertiesUpdatedEventArgs e);
-        public event ClassPropertiesUpdateHandler? ClassPropertiesUpdated;
-
-        public delegate void RelationshipUpdateHandler(object sender, RelationshipUpdatedEventArgs e);
-
-        protected void NotifyClassStateChanged(ChangedState.Operation operation, DomainClassDef instance, IDictionary<string, object> properties)
-        {
-            ClassPropertiesUpdated?.Invoke(instance, new ClassPropertiesUpdatedEventArgs() { Operation = operation.ToString(), ClassKeyLetter = instance.ClassName, Identities = instance.GetIdentities(), Properties = properties });
-        }
-
-        public event RelationshipUpdateHandler? RelationshipUpdated;
-        protected void NotifyRelationshipStateChanged(ChangedState.Operation operation, string relId, string phrase, DomainClassDef source, DomainClassDef destination)
-        {
-            RelationshipUpdated?.Invoke(this, new RelationshipUpdatedEventArgs() { Operation = operation.ToString(), RelationshipId = relId, Phrase = phrase, SourceClassKeyLetter = source.ClassName, SourceIdentities = source.GetIdentities(), DestinationClassKeyLetter = destination.ClassName, DestinationIdentities = destination.GetIdentities() });
-        }
+        public abstract event ClassPropertiesUpdateHandler ClassPropertiesUpdated;
+        public abstract event RelationshipUpdateHandler RelationshipUpdated;
 
         public IEnumerable<string> GetDomainNames()
         {
@@ -158,22 +145,4 @@ namespace Kae.DomainModel.Csharp.Framework
         }
     }
 
-    public class ClassPropertiesUpdatedEventArgs : EventArgs
-    {
-        public string Operation { get; set; }
-        public string ClassKeyLetter { get; set; }
-        public string Identities { get; set; }
-        public IDictionary<string, object> Properties { get; set; }
-    }
-
-    public class RelationshipUpdatedEventArgs : EventArgs
-    {
-        public string Operation { get; set; }
-        public string RelationshipId { get; set; }
-        public string Phrase { get; set; }
-        public string SourceClassKeyLetter { get; set; }
-        public string SourceIdentities { get; set; }
-        public string DestinationClassKeyLetter { get; set; }
-        public string DestinationIdentities { get; set; }
-    }
 }
