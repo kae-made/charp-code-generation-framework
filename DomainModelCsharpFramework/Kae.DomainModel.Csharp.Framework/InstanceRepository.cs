@@ -66,6 +66,20 @@ namespace Kae.DomainModel.Csharp.Framework
             return result;
         }
 
+        public delegate void CheckDomainInstanceStateDelegator(InstanceRepository instanceRepository, string domainName, Func<DomainClassDef, string> query, string classKeyLetter);
+
+        public IEnumerable<DomainClassDef> GetDomainInstances(string domainName, Func<DomainClassDef, bool> predicate)
+        {
+            List<DomainClassDef> result = new List<DomainClassDef>();
+            if (domainInstances.ContainsKey(domainName))
+            {
+                var instances = domainInstances[domainName];
+                result.AddRange(instances.Where(predicate));
+            }
+
+            return result;
+        }
+
         public IList<ChangedState> CreateChangedStates()
         {
             return new List<ChangedState>();
