@@ -12,4 +12,7 @@ namespace Kae.DomainModel.Csharp.Framework
     {
         public LinkedInstance Target { get; set; }
     }
+
+    public delegate void CLinkChangedStateNotifyHandler(CLinkChangedState changedState);
+
 }

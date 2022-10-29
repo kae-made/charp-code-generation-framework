@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Knowledge & Experience. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using Kae.DomainModel.Csharp.Framework.Adaptor.ExternalStorage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,18 @@ namespace Kae.DomainModel.Csharp.Framework
 
         public abstract event ClassPropertiesUpdateHandler ClassPropertiesUpdated;
         public abstract event RelationshipUpdateHandler RelationshipUpdated;
+
+        protected CInstanceChangedStateNotifyHandler cinstanceChangedStateNotifyHandler;
+        protected CLinkChangedStateNotifyHandler clinkChangedStateNotifyHandler;
+
+        public void AddCInstanceChangedStateNotifyHandler(CInstanceChangedStateNotifyHandler handler)
+        {
+            cinstanceChangedStateNotifyHandler = handler;
+        }
+        public void AddCLinkChangedStateNotifyHandler(CLinkChangedStateNotifyHandler handler)
+        {
+            clinkChangedStateNotifyHandler = handler;
+        }
 
         public IEnumerable<string> GetDomainNames()
         {
@@ -80,6 +93,17 @@ namespace Kae.DomainModel.Csharp.Framework
             return result;
         }
 
+        public void ClearAllInstances(string domainName)
+        {
+            if (domainInstances.ContainsKey(domainName))
+            {
+                foreach(var ci in domainInstances[domainName])
+                {
+                    Delete(ci);
+                }
+            }
+        }
+
         public IList<ChangedState> CreateChangedStates()
         {
             return new List<ChangedState>();
@@ -89,15 +113,31 @@ namespace Kae.DomainModel.Csharp.Framework
         {
             lock (domainInstances)
             {
+                var createdInstances = new List<DomainClassDef>();
+                var changedAll = new List<ChangedState>();
                 foreach (var changedState in changedStates)
                 {
                     if (changedState is CInstanceChagedState)
                     {
+                        var cinstChangedState = (CInstanceChagedState)changedState;
+                        if (changedState.OP == ChangedState.Operation.Create)
+                        {
+                            createdInstances.Add(cinstChangedState.Target);
+                            cinstChangedState.ChangedProperties = cinstChangedState.Target.ChangedProperties();
+                        }
                         UpdateCInstance((CInstanceChagedState)changedState);
+                        if (cinstanceChangedStateNotifyHandler != null)
+                        {
+                            cinstanceChangedStateNotifyHandler((CInstanceChagedState)changedState);
+                        }
                     }
                     else if (changedState is CLinkChangedState)
                     {
                         UpdateCLink((CLinkChangedState)changedState);
+                        if (clinkChangedStateNotifyHandler != null)
+                        {
+                            clinkChangedStateNotifyHandler((CLinkChangedState)changedState);
+                        }
                     }
                 }
                 foreach (var className in domainInstances.Keys)
@@ -105,12 +145,24 @@ namespace Kae.DomainModel.Csharp.Framework
                     foreach (var instance in domainInstances[className])
                     {
                         var updatedState = instance.ChangedProperties();
-                        UpdateState(instance, updatedState);
+                        if (updatedState.Count > 0)
+                        {
+                            if (!createdInstances.Contains(instance))
+                            {
+                                var cinstChangedState = new CInstanceChagedState() { OP = ChangedState.Operation.Update, Target = instance, ChangedProperties = updatedState };
+                                UpdateCInstance(cinstChangedState);
+                                if (cinstanceChangedStateNotifyHandler != null)
+                                {
+                                    cinstanceChangedStateNotifyHandler(cinstChangedState);
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
 
+#if false
         public void UpdateState()
         {
             foreach (var className in domainInstances.Keys)
@@ -122,13 +174,13 @@ namespace Kae.DomainModel.Csharp.Framework
                 }
             }
         }
-
+#endif
         ///
         /// Update stored state of the instance by changed argument.
         /// changed.key is name of property of the instance.
         /// changed.value is value of the property that the name of it  is changed.key
         ///
-        public abstract void UpdateState(DomainClassDef instance, IDictionary<string, object> chnaged);
+        // public abstract void UpdateState(DomainClassDef instance, IDictionary<string, object> chnaged);
 
         ///
         /// Construct state of the instances by instances argument.
@@ -157,6 +209,9 @@ namespace Kae.DomainModel.Csharp.Framework
             }
             return eeDef;
         }
+
+        protected IExternalStorageAdaptor externalStorageAdaptor;
+        public IExternalStorageAdaptor ExternalStorageAdaptor { get { return externalStorageAdaptor; } set { externalStorageAdaptor = value; } }
     }
 
 }

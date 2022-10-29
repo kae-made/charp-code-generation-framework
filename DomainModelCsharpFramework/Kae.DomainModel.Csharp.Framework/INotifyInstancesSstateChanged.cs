@@ -10,6 +10,7 @@ namespace Kae.DomainModel.Csharp.Framework
 {
     public delegate void ClassPropertiesUpdateHandler(object sender, ClassPropertiesUpdatedEventArgs e);
     public delegate void RelationshipUpdateHandler(object sender, RelationshipUpdatedEventArgs e);
+    
 
     public interface INotifyInstancesSstateChanged
     {
@@ -20,6 +21,7 @@ namespace Kae.DomainModel.Csharp.Framework
     {
         public string Operation { get; set; }
         public string ClassKeyLetter { get; set; }
+        public DomainClassDef Instance { get; set; }
         public string Identities { get; set; }
         public IDictionary<string, object> Properties { get; set; }
     }
@@ -30,8 +32,10 @@ namespace Kae.DomainModel.Csharp.Framework
         public string RelationshipId { get; set; }
         public string Phrase { get; set; }
         public string SourceClassKeyLetter { get; set; }
+        public DomainClassDef SourceInstance { get; set; }
         public string SourceIdentities { get; set; }
         public string DestinationClassKeyLetter { get; set; }
+        public DomainClassDef DestinationInstance { get; set; }
         public string DestinationIdentities { get; set; }
     }
 

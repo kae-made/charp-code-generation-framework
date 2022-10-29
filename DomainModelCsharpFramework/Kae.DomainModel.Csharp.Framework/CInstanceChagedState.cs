@@ -9,7 +9,10 @@ using System.Threading.Tasks;
 namespace Kae.DomainModel.Csharp.Framework
 {
     public class CInstanceChagedState : ChangedState
-    {        public DomainClassDef Target { get; set; }
+    {
+        public DomainClassDef Target { get; set; }
         public IDictionary<string, object> ChangedProperties { get; set; }
     }
+
+    public delegate void CInstanceChangedStateNotifyHandler(CInstanceChagedState changedState);
 }
