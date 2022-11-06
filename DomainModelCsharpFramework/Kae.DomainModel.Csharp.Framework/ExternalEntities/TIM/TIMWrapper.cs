@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Knowledge & Experience. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using Kae.StateMachine;
+using Kae.Utility.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,15 @@ namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.TIM
     {
         protected static readonly string eeKeyLetter = "TIM";
         public string EEKey { get { return eeKeyLetter; } }
+
+        protected Logger logger;
+        public Logger Logger { get { return logger; } set { logger = value; } }
+        public IList<string> Configuration { get { return new List<string>(); } }
+
+        public void Initialize(IDictionary<string, string> configuration)
+        {
+            ;
+        }
 
         public abstract DateTime create_date(int year, int month, int day, int hour, int minute, int second);
         public abstract DateTime current_clock();

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>1.1.0</Version>
+    <Authors>Hiroshi Ota</Authors>
+    <Company>Knowledge &amp; Experience</Company>
+    <PackageProjectUrl>https://github.com/kae-made/charp-code-generation-framework</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kae-made/charp-code-generation-framework</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Kae.DomainModel.Csharp.Framework.Core" Version="1.2.0" />
+    <PackageReference Include="Kae.Utility.Logging" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>

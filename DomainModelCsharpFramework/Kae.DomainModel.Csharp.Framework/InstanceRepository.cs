@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Kae.DomainModel.Csharp.Framework
 {
-    public abstract class InstanceRepository : INotifyInstancesSstateChanged
+    public abstract class InstanceRepository : INotifyInstancesSstateChanged, IExternalStorageAdaptable
     {
         protected Dictionary<string, List<DomainClassDef>> domainInstances = new Dictionary<string, List<DomainClassDef>>();
         protected Dictionary<string, ExternalEntityDef> externalEntities = new Dictionary<string, ExternalEntityDef>();
@@ -19,6 +19,8 @@ namespace Kae.DomainModel.Csharp.Framework
 
         protected CInstanceChangedStateNotifyHandler cinstanceChangedStateNotifyHandler;
         protected CLinkChangedStateNotifyHandler clinkChangedStateNotifyHandler;
+        protected CEventChangedStateNotifyHandler eventChangedStateNotifyHandler;
+      
 
         public void AddCInstanceChangedStateNotifyHandler(CInstanceChangedStateNotifyHandler handler)
         {
@@ -27,6 +29,10 @@ namespace Kae.DomainModel.Csharp.Framework
         public void AddCLinkChangedStateNotifyHandler(CLinkChangedStateNotifyHandler handler)
         {
             clinkChangedStateNotifyHandler = handler;
+        }
+        public void AddCEventChangedStateNotifyHandler(CEventChangedStateNotifyHandler handler)
+        {
+            eventChangedStateNotifyHandler = handler;
         }
 
         public IEnumerable<string> GetDomainNames()

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Kae.DomainModel.Csharp.Framework.ExternalEntity" Version="0.2.0" />
+    <PackageReference Include="Kae.Utility.Logging" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Azure.Devices" Version="1.38.1" />
+  </ItemGroup>
+
+</Project>
