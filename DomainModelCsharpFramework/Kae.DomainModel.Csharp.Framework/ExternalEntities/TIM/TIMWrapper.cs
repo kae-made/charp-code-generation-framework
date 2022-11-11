@@ -17,9 +17,9 @@ namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.TIM
 
         protected Logger logger;
         public Logger Logger { get { return logger; } set { logger = value; } }
-        public IList<string> Configuration { get { return new List<string>(); } }
+        public IList<string> ConfigurationKeys { get { return new List<string>(); } }
 
-        public void Initialize(IDictionary<string, string> configuration)
+        public void Initialize(IDictionary<string, object> configuration)
         {
             ;
         }

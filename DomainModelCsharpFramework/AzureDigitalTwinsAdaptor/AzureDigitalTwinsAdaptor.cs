@@ -145,7 +145,11 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor.ExternalStorage.AzureDigitalT
             try
             {
                 string msgId = Guid.NewGuid().ToString();
-                string payload = Newtonsoft.Json.JsonConvert.SerializeObject(changedState.Event.GetSupplementalData());
+                var eventContent = new Dictionary<string, object>()
+                {
+                    { changedState.Event.EventName , changedState.Event.GetSupplementalData() }
+                };
+                string payload = Newtonsoft.Json.JsonConvert.SerializeObject(eventContent);
                 await adtClient.PublishTelemetryAsync(changedState.Target.GetIdForExternalStorage(), msgId, payload);
                 logger.LogInfo($"Published Telemetry:messageId={msgId}");
             }

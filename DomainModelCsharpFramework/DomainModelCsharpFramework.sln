@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32413.511
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kae.DomainModel.Csharp.Framework", "Kae.DomainModel.Csharp.Framework\Kae.DomainModel.Csharp.Framework.csproj", "{79CA2852-4318-4BE7-B380-999FDABD269B}"
 EndProject
@@ -14,8 +14,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kae.DomainModel.Csharp.Framework.Core", "Kae.DomainModel.Csharp.Framework.Core\Kae.DomainModel.Csharp.Framework.Core.csproj", "{6478FF1E-93CF-4091-BA0F-1037BA20ECF0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kae.DomainModel.Csharp.Framework.ExternalEntity", "Kae.DomainModel.Csharp.Framework.ExternalEntity\Kae.DomainModel.Csharp.Framework.ExternalEntity.csproj", "{2660182D-D289-43A5-9DCE-4C880667AFC5}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kae.DomainModel.Csharp.Framework.Adaptor.ExternalStorage", "Kae.DomainModel.Csharp.Framework.Adaptor.ExternalStorage\Kae.DomainModel.Csharp.Framework.Adaptor.ExternalStorage.csproj", "{0870F220-D4F0-45AC-88A0-696994F1F9D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +45,6 @@ Global
 		{2660182D-D289-43A5-9DCE-4C880667AFC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2660182D-D289-43A5-9DCE-4C880667AFC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2660182D-D289-43A5-9DCE-4C880667AFC5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0870F220-D4F0-45AC-88A0-696994F1F9D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0870F220-D4F0-45AC-88A0-696994F1F9D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0870F220-D4F0-45AC-88A0-696994F1F9D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0870F220-D4F0-45AC-88A0-696994F1F9D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,8 +15,8 @@ namespace Kae.DomainModel.Csharp.Framework
        
         Logger Logger { get; set; }
 
-        IList<string> Configuration { get; }
-        void Initialize(IDictionary<string, string> configuration);
+        IList<string> ConfigurationKeys { get; }
+        void Initialize(IDictionary<string, object> configuration);
 
     }
 }

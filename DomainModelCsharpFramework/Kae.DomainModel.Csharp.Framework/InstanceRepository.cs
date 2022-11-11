@@ -42,27 +42,33 @@ namespace Kae.DomainModel.Csharp.Framework
 
         public void Add(DomainClassDef instance)
         {
-            if (!domainInstances.ContainsKey(instance.ClassName))
+            lock (domainInstances)
             {
-                domainInstances.Add(instance.ClassName, new List<DomainClassDef>());
+                if (!domainInstances.ContainsKey(instance.ClassName))
+                {
+                    domainInstances.Add(instance.ClassName, new List<DomainClassDef>());
+                }
+                domainInstances[instance.ClassName].Add(instance);
             }
-            domainInstances[instance.ClassName].Add(instance);
         }
 
         public bool Delete(DomainClassDef instance)
         {
             bool result = false;
 
-            if (domainInstances.ContainsKey(instance.ClassName))
+            lock (domainInstances)
             {
-                if (domainInstances[instance.ClassName].Contains(instance))
+                if (domainInstances.ContainsKey(instance.ClassName))
                 {
-                    domainInstances[instance.ClassName].Remove(instance);
-                    if (domainInstances[instance.ClassName].Count == 0)
+                    if (domainInstances[instance.ClassName].Contains(instance))
                     {
-                        domainInstances.Remove(instance.ClassName);
+                        domainInstances[instance.ClassName].Remove(instance);
+                        if (domainInstances[instance.ClassName].Count == 0)
+                        {
+                            domainInstances.Remove(instance.ClassName);
+                        }
+                        result = true;
                     }
-                    result = true;
                 }
             }
 
@@ -73,12 +79,15 @@ namespace Kae.DomainModel.Csharp.Framework
         {
             List<DomainClassDef> result = new List<DomainClassDef>();
 
-            if (domainInstances.ContainsKey(domainName))
+            lock (domainInstances)
             {
-                var instances = domainInstances[domainName];
-                foreach (var instance in instances)
+                if (domainInstances.ContainsKey(domainName))
                 {
-                    result.Add(instance);
+                    var instances = domainInstances[domainName];
+                    foreach (var instance in instances)
+                    {
+                        result.Add(instance);
+                    }
                 }
             }
 
@@ -90,22 +99,27 @@ namespace Kae.DomainModel.Csharp.Framework
         public IEnumerable<DomainClassDef> GetDomainInstances(string domainName, Func<DomainClassDef, bool> predicate)
         {
             List<DomainClassDef> result = new List<DomainClassDef>();
-            if (domainInstances.ContainsKey(domainName))
+            lock (domainInstances)
             {
-                var instances = domainInstances[domainName];
-                result.AddRange(instances.Where(predicate));
+                if (domainInstances.ContainsKey(domainName))
+                {
+                    var instances = domainInstances[domainName];
+                    result.AddRange(instances.Where(predicate));
+                }
             }
-
             return result;
         }
 
         public void ClearAllInstances(string domainName)
         {
-            if (domainInstances.ContainsKey(domainName))
+            lock (domainInstances)
             {
-                foreach(var ci in domainInstances[domainName])
+                if (domainInstances.ContainsKey(domainName))
                 {
-                    Delete(ci);
+                    foreach (var ci in domainInstances[domainName])
+                    {
+                        Delete(ci);
+                    }
                 }
             }
         }
@@ -203,17 +217,36 @@ namespace Kae.DomainModel.Csharp.Framework
 
         public void Add(ExternalEntityDef externalEntity)
         {
-            externalEntities.Add(externalEntity.EEKey, externalEntity);
+            lock (externalEntities)
+            {
+                externalEntities.Add(externalEntity.EEKey, externalEntity);
+            }
         }
 
         public ExternalEntityDef GetExternalEntity(string eeKey)
         {
             ExternalEntityDef eeDef = null;
-            if (externalEntities.ContainsKey(eeKey))
+            lock (externalEntities)
             {
-                eeDef = externalEntities[eeKey];
+                if (externalEntities.ContainsKey(eeKey))
+                {
+                    eeDef = externalEntities[eeKey];
+                }
             }
             return eeDef;
+        }
+
+        public IList<ExternalEntityDef> GetExternalEntities()
+        {
+            var resultSet = new List<ExternalEntityDef>();
+            lock (externalEntities)
+            {
+                foreach (var eeKey in externalEntities.Keys)
+                {
+                    resultSet.Add(GetExternalEntity(eeKey));
+                }
+            }
+            return resultSet;
         }
 
         protected IExternalStorageAdaptor externalStorageAdaptor;

@@ -1,4 +1,6 @@
-﻿using Kae.Utility.Logging;
+﻿// Copyright (c) Knowledge & Experience. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+using Kae.Utility.Logging;
 using Microsoft.Azure.Amqp.Framing;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Shared;
@@ -24,11 +26,16 @@ namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.AzureIoTHub
             CloudToDeviceMethodResult invocationResult = null;
             if (string.IsNullOrEmpty(moduleName))
             {
+                logger.LogInfo($"Invoking {method.MethodName} of {deviceId}...");
                 invocationResult = await serviceClient.InvokeDeviceMethodAsync(deviceId, method);
+                logger.LogInfo($"Invoked {method.MethodName} of {deviceId} Status - {invocationResult.Status}");
+
             }
             else
             {
+                logger.LogInfo($"Invoking {method.MethodName} of {deviceId}.{moduleName}...");
                 invocationResult = await serviceClient.InvokeDeviceMethodAsync(deviceId, moduleName, method);
+                logger.LogInfo($"Invoked {method.MethodName} of {deviceId}.{moduleName} Status - {invocationResult.Status}");
             }
             return (invocationResult.GetPayloadAsJson(), invocationResult.Status);
         }
@@ -38,11 +45,15 @@ namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.AzureIoTHub
             var sendingMessage = new Message(System.Text.Encoding.UTF8.GetBytes(command));
             if (string.IsNullOrEmpty(moduleName))
             {
+                logger.LogInfo($"Sending to {deviceId}...");
                 await serviceClient.SendAsync(deviceId, sendingMessage);
+                logger.LogInfo($"Send to {deviceId}.");
             }
             else
             {
+                logger.LogInfo($"Sending to {deviceId}.{moduleName}...");
                 await serviceClient.SendAsync(deviceId, moduleName, sendingMessage);
+                logger.LogInfo($"Send to {deviceId}.{moduleName}.");
             }
         }
 
@@ -71,11 +82,15 @@ namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.AzureIoTHub
             string dtPatch = Newtonsoft.Json.JsonConvert.SerializeObject(updateTwin);
             if (string.IsNullOrEmpty(moduleName))
             {
+                logger.LogInfo($"Updating {name} property to {deviceId}...");
                 await registryManager.UpdateTwinAsync(deviceId, dtPatch, currentTwin.ETag);
+                logger.LogInfo($"Updated {name} property to {deviceId}.");
             }
             else
             {
+                logger.LogInfo($"Updating {name} property to {deviceId}.{moduleName}...");
                 await registryManager.UpdateTwinAsync(deviceId, moduleName, dtPatch, currentTwin.ETag);
+                logger.LogInfo($"Updated {name} property to {deviceId}.{moduleName}.");
             }
         }
     }

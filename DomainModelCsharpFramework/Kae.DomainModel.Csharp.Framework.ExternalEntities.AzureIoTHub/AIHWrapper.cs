@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Knowledge & Experience. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-
 using Kae.Utility.Logging;
 using Microsoft.Azure.Devices;
 
@@ -9,7 +7,7 @@ namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.AzureIoTHub
 {
     public abstract class AIHWrapper : ExternalEntityDef
     {
-        protected string eeKey = "AIM";
+        protected string eeKey = "AIH";
         public string EEKey { get { return eeKey; } }
 
         public Logger Logger { get { return logger; } set { logger = value; } }
@@ -21,11 +19,11 @@ namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.AzureIoTHub
 
         public static readonly string configIoTHubConnectionStringKey = "iothub-connection-string";
 
-        public IList<string> Configuration { get { return new List<string> { configIoTHubConnectionStringKey }; } }
+        public IList<string> ConfigurationKeys { get { return new List<string> { configIoTHubConnectionStringKey }; } }
 
-        public async void Initialize(IDictionary<string,string> configuration)
+        public async void Initialize(IDictionary<string, object> configuration)
         {
-            if (logger!=null)
+            if (logger != null)
             {
                 if (!configuration.ContainsKey(configIoTHubConnectionStringKey))
                 {
@@ -33,7 +31,7 @@ namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.AzureIoTHub
                     throw new ArgumentOutOfRangeException($"Azure IoT Hub Wrapper needs {configIoTHubConnectionStringKey} for initialization!");
                 }
             }
-            this.connectionString = configuration[configIoTHubConnectionStringKey];
+            this.connectionString = (string)configuration[configIoTHubConnectionStringKey];
             serviceClient = ServiceClient.CreateFromConnectionString(connectionString);
             registryManager = RegistryManager.CreateFromConnectionString(connectionString);
 
@@ -61,5 +59,6 @@ namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.AzureIoTHub
         public abstract Task SendCommand(string command, string deviceId, string moduleName = null);
         public abstract Task UpdateProperty(string name, object value, string deviceId, string moduleName = "");
         public abstract Task<(string resultPayload, int status)> InvokeOperation(string name, string payload, string deviceId, string moduleName = "");
+
     }
 }

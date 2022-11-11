@@ -27,6 +27,9 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor
         public Dictionary<string, ClassSpec> ClassSpecs { get { return classSpecs; } }
         public string DomainModelName { get { return domainModelName; } }
 
+        public abstract IDictionary<string, IList<string>> ConfigurationKeys();
+        public abstract void Initialize(IDictionary<string, IDictionary<string, object>> config);
+
         public string GetDataTypeName(int n)
         {
             return ((ParamSpec.DataType)Enum.ToObject(typeof(ParamSpec.DataType), n)).ToString();

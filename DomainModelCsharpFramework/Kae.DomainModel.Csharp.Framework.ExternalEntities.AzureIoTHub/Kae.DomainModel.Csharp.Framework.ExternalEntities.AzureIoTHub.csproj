@@ -4,11 +4,25 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Version>1.0.0</Version>
+    <Authors>Hiroshi Ota</Authors>
+    <Company>Knowledge &amp; Experience</Company>
+    <PackageProjectUrl>https://github.com/kae-made/domain-model-csharp-azure-iot-hub-binder</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kae-made/domain-model-csharp-azure-iot-hub-binder</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>kae-log-no-chart-128.png</PackageIcon>
+    <Copyright>Copyright (c) Knowledge &amp; Experience. All rights reserved.</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kae.DomainModel.Csharp.Framework.ExternalEntity" Version="0.2.0" />
-    <PackageReference Include="Kae.Utility.Logging" Version="1.0.0" />
+    <None Include="..\..\..\..\OneDrive\画像\kae-log-no-chart-128.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Kae.DomainModel.Csharp.Framework.ExternalEntity" Version="1.2.0" />
     <PackageReference Include="Microsoft.Azure.Devices" Version="1.38.1" />
   </ItemGroup>
 
