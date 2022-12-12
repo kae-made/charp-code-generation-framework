@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1.4.0</Version>
+    <Version>1.5.0</Version>
     <Authors>Hiroshi Ota</Authors>
     <Company>Knowledge &amp; Experience</Company>
     <PackageProjectUrl>https://github.com/kae-made/charp-code-generation-framework</PackageProjectUrl>
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kae.DomainModel.Csharp.Framework.Core" Version="1.4.0" />
+    <PackageReference Include="Kae.DomainModel.Csharp.Framework.Core" Version="1.5.0" />
   </ItemGroup>
 
 </Project>
