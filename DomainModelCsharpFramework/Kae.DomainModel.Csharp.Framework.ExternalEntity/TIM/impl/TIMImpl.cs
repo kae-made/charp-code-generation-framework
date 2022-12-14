@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.TIM.impl
 {
-    internal class TIMImpl : TIMWrapper
+    public class TIMImpl : TIMWrapper
     {
         private List<Timer> timers = new List<Timer>();
         public override DateTime create_date(int year, int month, int day, int hour, int minute, int second)

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kae.DomainModel.Csharp.Framework.ExternalEntity.RND
+namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.RND
 {
     public class RNDImpl : RNDWrapper
     {

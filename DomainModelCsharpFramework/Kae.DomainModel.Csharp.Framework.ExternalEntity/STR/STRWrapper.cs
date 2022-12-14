@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kae.DomainModel.Csharp.Framework.ExternalEntity.STR
+namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.STR
 {
     public abstract class STRWrapper : ExternalEntityDef
     {

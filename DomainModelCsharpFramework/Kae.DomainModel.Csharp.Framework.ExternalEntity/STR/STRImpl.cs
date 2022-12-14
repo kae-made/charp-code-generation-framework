@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Kae.DomainModel.Csharp.Framework.ExternalEntity.STR
+namespace Kae.DomainModel.Csharp.Framework.ExternalEntities.STR
 {
     public class STRImpl : STRWrapper
     {
