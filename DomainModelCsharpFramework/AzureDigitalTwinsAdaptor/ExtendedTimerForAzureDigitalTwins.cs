@@ -28,17 +28,27 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor.ExternalStorage.AzureDigitalT
         public override bool cancel(ExternalEntities.TIM.Timer timer_inst_ref)
         {
             bool existed = false;
-            var operation = new EventTimerOperation() { TimerId=timer_inst_ref.TimerId, Operation= EventTimerOperation.OperationType.cancel };
-            var content = new StringContent(operation.Serialize());
-            var response = httpClient.PostAsync(timerServiceUrl, content).Result;
-            if (response.StatusCode== System.Net.HttpStatusCode.OK)
+            string cancelUrl = $"{timerServiceUrl}/CancelTimer?timerid={timer_inst_ref.TimerId}";
+            var response = httpClient.GetAsync(timerServiceUrl).Result;
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 using (var reader = new StreamReader(response.Content.ReadAsStream()))
                 {
-                    var result = Newtonsoft.Json.JsonConvert.DeserializeObject<EventTimerResponse>(reader.ReadToEnd());
-                    existed = result.WaitForFire;
+                    string responseJson = reader.ReadToEnd();
+                    var timerServiceResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<EventTimerResponse>(responseJson);
+                    if (timerServiceResponse != null)
+                    {
+                        existed = timerServiceResponse.WaitForFire;
+                                            }
                 }
-                logger.LogInfo($"Timer[{timer_inst_ref.TimerId}] has been caneled - {existed}");
+                if (existed)
+                {
+                    logger.LogInfo($"Timer[{timer_inst_ref.TimerId}] has been caneled - {existed}");
+                }
+                else
+                {
+                    logger.LogInfo($"Timer[{timer_inst_ref.TimerId}] has been expired - {existed}");
+                }
             }
             else
             {
@@ -50,19 +60,32 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor.ExternalStorage.AzureDigitalT
         public override DateTime remaining_time(ExternalEntities.TIM.Timer timer_inst_ref)
         {
             DateTime datetime = DateTime.Now;
-            var operation = new EventTimerOperation() { TimerId = timer_inst_ref.TimerId, Operation = EventTimerOperation.OperationType.remaining_time };
-            var content = new StringContent(operation.Serialize());
-            var response = httpClient.PostAsync(timerServiceUrl, content).Result;
+            bool existed = false;
+            string cancelUrl = $"{timerServiceUrl}/TimerStatus?timerid={timer_inst_ref.TimerId}";
+            var response = httpClient.GetAsync(timerServiceUrl).Result;
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 using (var reader = new StreamReader(response.Content.ReadAsStream()))
                 {
-                    var result = Newtonsoft.Json.JsonConvert.DeserializeObject<EventTimerResponse>(reader.ReadToEnd());
-                    if (result != null)
+                    string responseJson = reader.ReadToEnd();
+                    var timerServiceResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<EventTimerResponse>(responseJson);
+                    if (timerServiceResponse != null)
                     {
-                        datetime = result.RemainingTime;
+                        existed = timerServiceResponse.WaitForFire;
+                        if (existed)
+                        {
+                            datetime = timerServiceResponse.RemainingTime;
+                            logger.LogInfo($"Timer[{timer_inst_ref.TimerId}] remaining_time is {datetime.ToString("yyyyMMddTHHmmss")}");
+                        }
+                        else
+                        {
+                            logger.LogInfo($"Timer[{timer_inst_ref.TimerId}] has been expired!");
+                        }
                     }
-                    logger.LogInfo($"Timer[{timer_inst_ref.TimerId}] remaining_time is {datetime.ToString("yyyyMMddTHHmmss")}");
+                    else
+                    {
+                        logger.LogWarning($"Timer[{timer_inst_ref.TimerId}] has no information!");
+                    }
                 }
             }
             else
@@ -74,27 +97,8 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor.ExternalStorage.AzureDigitalT
 
         public override bool reset_time(ExternalEntities.TIM.Timer timer_inst_ref, DateTime datetime)
         {
-            bool existed = false;
-            var operation = new EventTimerOperation() { TimerId = timer_inst_ref.TimerId, Operation = EventTimerOperation.OperationType.reset_time };
-            var content = new StringContent(operation.Serialize());
-            var response = httpClient.PostAsync(timerServiceUrl, content).Result;
-            if (response.StatusCode== System.Net.HttpStatusCode.OK)
-            {
-                using (var reader = new StreamReader(response.Content.ReadAsStream()))
-                {
-                    var result = Newtonsoft.Json.JsonConvert.DeserializeObject<EventTimerResponse>(reader.ReadToEnd());
-                    if (result != null)
-                    {
-                        existed = result.WaitForFire;
-                    }
-                }
-                logger.LogInfo($"Timer[{timer_inst_ref.TimerId}] has been reset - {existed}");
-            }
-            else
-            {
-                logger.LogWarning($"Timer[{timer_inst_ref.TimerId}] reset_time failed - {response.StatusCode.ToString()}");
-            }
-            return existed;
+            logger.LogError("reset_time is not supported!");
+            throw new NotImplementedException("reset_time is not supported!");
         }
 
         public override ExternalEntities.TIM.Timer start(DateTime datetime, EventData event_inst)
@@ -109,42 +113,40 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor.ExternalStorage.AzureDigitalT
                 DestinationIdentities = event_inst.GetReceiverIdentities(),
                 Parameters = event_inst.GetSupplementalData()
             };
-            var content =new StringContent(operation.Serialize());
+            var content = new StringContent(operation.Serialize());
+            string timerServiceStartUrl = $"{timerServiceUrl}/TimerService_HttpStart";
             var response = httpClient.PostAsync(timerServiceUrl, content).Result;
-            if (response.StatusCode== System.Net.HttpStatusCode.OK)
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
+                string instanceId = "";
+                using (var reader = new StreamReader(response.Content.ReadAsStream()))
+                {
+                    string responseContentJson = reader.ReadToEnd();
+                    dynamic responseContent = Newtonsoft.Json.JsonConvert.DeserializeObject(responseContentJson);
+                    instanceId = responseContent.id;
+                }
                 logger.LogInfo($"Timer[{newTimer.TimerId}] has been started.");
+                if (newTimer.TimerId != instanceId)
+                {
+                    logger.LogError($"orchestration id is different - {instanceId}");
+                }
             }
             else
             {
                 logger.LogWarning($"Timer[{newTimer.TimerId}] start failed - {response.StatusCode.ToString()}");
+                using (var reader = new StreamReader(response.Content.ReadAsStream()))
+                {
+                    string responseContentJson = reader.ReadToEnd();
+                    logger.LogWarning($"Response - {responseContentJson}");
+                }
             }
             return newTimer;
         }
 
         public override ExternalEntities.TIM.Timer start_recuring(DateTime datetime, EventData event_inst)
         {
-            var newTimer = new TimerImpl(event_inst, datetime);
-            var operation = new EventTimerOperation()
-            {
-                TimerId = newTimer.TimerId,
-                Operation = EventTimerOperation.OperationType.start_recurring,
-                FireTime = datetime,
-                EventLabel = event_inst.EventName,
-                DestinationIdentities = event_inst.GetReceiverIdentities(),
-                Parameters = event_inst.GetSupplementalData()
-            };
-            var content = new StringContent(operation.Serialize());
-            var response = httpClient.PostAsync(timerServiceUrl, content).Result;
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                logger.LogInfo($"Timer[{newTimer.TimerId}] has been started recuring.");
-            }
-            else
-            {
-                logger.LogWarning($"Timer[{newTimer.TimerId}] start recuring failed - {response.StatusCode.ToString()}");
-            }
-            return newTimer;
+            logger.LogError("start_recuring is not supported!");
+            throw new NotImplementedException("start_recuring is not supported!");
         }
 
         protected override void InitializeImple()
@@ -161,10 +163,14 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor.ExternalStorage.AzureDigitalT
     public class TimerImpl : Timer
     {
         public string TimerIdOnService { get; set; }
-        public TimerImpl(EventData eventData, DateTime fireTime) : base(eventData,0)
+        public TimerImpl() : base(null, 0)
+        {
+
+        }
+        public TimerImpl(EventData eventData, DateTime fireTime) : base(eventData, 0)
         {
             this.firingTime = fireTime;
-            TimerIdOnService = Guid.NewGuid().ToString();
+            TimerIdOnService = this.TimerId;
         }
 
         public override bool AddTime(long microseconds)

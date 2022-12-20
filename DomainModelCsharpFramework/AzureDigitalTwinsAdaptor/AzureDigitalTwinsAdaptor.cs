@@ -118,13 +118,18 @@ namespace Kae.DomainModel.Csharp.Framework.Adaptor.ExternalStorage.AzureDigitalT
                     var updateTwinData = new JsonPatchDocument();
                     foreach (var ckey in changedState.ChangedProperties.Keys)
                     {
+                        var changedProperty = changedState.ChangedProperties[ckey];
+                        if (changedProperty is TimerImpl)
+                        {
+                            changedProperty = ((TimerImpl)changedProperty).TimerIdOnService;
+                        }
                         if (existedTwin.Value.Contents.ContainsKey(ckey))
                         {
-                            updateTwinData.AppendReplace($"/{ckey}", changedState.ChangedProperties[ckey]);
+                            updateTwinData.AppendReplace($"/{ckey}", changedProperty);
                         }
                         else
                         {
-                            updateTwinData.AppendAdd($"/{ckey}", changedState.ChangedProperties[ckey]);
+                            updateTwinData.AppendAdd($"/{ckey}", changedProperty);
                         }
                     }
                     await adtClient.UpdateDigitalTwinAsync(twinId, updateTwinData);
